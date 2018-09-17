@@ -108,6 +108,15 @@ def show_points():
     screen.blit(text, text_rect)
 
 
+def show_lives():
+    font = pygame.font.SysFont('Consolas', 20)
+    chain = "Vidas: " + str(lives).zfill(2)
+    text = font.render(chain, True, white_color)
+    text_rect = text.get_rect()
+    text_rect.topright = [WIDTH, 0]
+    screen.blit(text, text_rect)
+
+
 # Inicializando pantalla
 
 
@@ -126,6 +135,8 @@ ball = Ball()
 player = Paddle()
 wall = Wall(50)
 points = 0
+lives = 3
+waiting_tOut = True
 
 while True:
     # Establecer FPS
@@ -139,9 +150,19 @@ while True:
         # Buscar eventos del teclado,
         elif evento.type == pygame.KEYDOWN:
             player.update(evento)
+            if waiting_tOut == True and evento.key == pygame.K_SPACE:
+                waiting_tOut = False
+                if ball.rect.centerx < WIDTH / 2:
+                    ball.speed = [3, -3]
+                else:
+                    ball.speed = [-3, -3]
+
 
     # Actualizar la posicion de la bola
-    ball.update()
+    if waiting_tOut == False:
+        ball.update()
+    else:
+        ball.rect.midbottom = player.rect.midtop
 
     # Colision entre la bola y el jugador
     if pygame.sprite.collide_rect(ball, player):
@@ -161,12 +182,15 @@ while True:
 
     # Revisar si la bola sale de la pantalla
     if ball.rect.top > HEIGHT:
-        game_over()
+        lives -= 1
+        waiting_tOut = True
 
     # Rellenar fondo de pantalla con el color azul
     screen.fill(bgBlueCol)
     # Mostrar puntuacion
     show_points()
+    # Mostrar vidas
+    show_lives()
     # Dibujar bola en pantalla
     screen.blit(ball.image, ball.rect)
     # Dibujar jugador en pantalla
@@ -175,3 +199,6 @@ while True:
     wall.draw(screen)
     # Actualizar los elementos en pantalla
     pygame.display.flip()
+
+    if lives <= 0:
+        game_over()
