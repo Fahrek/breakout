@@ -31,6 +31,56 @@ class Scene:
         "Selecciona la nueva escena a ser desplegada"
         self.nextScene = scene
 
+
+class Director:
+    def __init__(self, title = "", res = (WIDTH, HEIGHT)):
+        pygame.init()
+        self.screen = pygame.display.set_mode(res)
+        # Configurar título de la pantalla
+        pygame.display.set_caption(title)
+        # Crear el reloj
+        self.clock = pygame.time.Clock()
+        self.scene = None
+        self.scenes = {}
+
+    def execute(self, init_scene, fps = 60):
+        self.scene = self.scenes[init_scene]
+        playing = True
+        while playing:
+            self.clock.tick(fps)
+            events = pygame.event.get()
+            # Revisar todos los eventos
+            for event in events:
+                # Si se presiona la cruz de la barra de titulo,
+                if event.type == pygame.QUIT:
+                    # cerrar el videojuego
+                    playing = False
+
+            self.scene.read_events(events)
+            self.scene.update()
+            self.scene.render(self.screen)
+
+            self.choiceScene(self.scene.nextScene)
+
+            if playing:
+                playing = self.scene.playing
+
+            pygame.display.flip()
+
+        time.sleep(3)
+
+    def choiceScene(self, nextScene):
+        if nextScene:
+            if nextScene not in self.scenes:
+                self.addScene(nextScene)
+            self.scene = self.scenes[nextScene]
+
+    def addScene(self, scene):
+        sceneClass = 'STAGE' + scene
+        sceneObj = globals()[sceneClass]
+        self.scenes[scene] = sceneObj()
+
+
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -140,8 +190,6 @@ def show_lives():
 
 
 # Inicializando pantalla
-
-
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 # Configurar título de la pantalla
 pygame.display.set_caption('BreakOut')
@@ -164,15 +212,15 @@ while True:
     # Establecer FPS
     clock.tick(60)
     # Revisar todos los eventos
-    for evento in pygame.event.get():
+    for event in pygame.event.get():
         # Si se presiona la cruz de la barra de titulo,
-        if evento.type == pygame.QUIT:
+        if event.type == pygame.QUIT:
             # cerrar el videojuego
             sys.exit()
         # Buscar eventos del teclado,
-        elif evento.type == pygame.KEYDOWN:
-            player.update(evento)
-            if waiting_tOut == True and evento.key == pygame.K_SPACE:
+        elif event.type == pygame.KEYDOWN:
+            player.update(event)
+            if waiting_tOut == True and event.key == pygame.K_SPACE:
                 waiting_tOut = False
                 if ball.rect.centerx < WIDTH / 2:
                     ball.speed = [3, -3]
