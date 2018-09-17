@@ -9,6 +9,28 @@ white_color = (255, 255, 255)  # Color blanco para textos
 
 pygame.init()
 
+class Scene:
+    def __init__(self):
+        "Initialization"
+        self.nextScene = False
+        self.playing = True
+
+    def read_events(self, events):
+        "Lee la lista de los todos eventos"
+        pass
+
+    def update(self):
+        "Calculos y logica"
+        pass
+
+    def render(self, screen):
+        "Dibujar los objetos en pantalla"
+        pass
+
+    def change_scene(self, scene):
+        "Selecciona la nueva escena a ser desplegada"
+        self.nextScene = scene
+
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
