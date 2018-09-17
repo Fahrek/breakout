@@ -42,17 +42,45 @@ class Paddle(pygame.sprite.Sprite):
         # Establecer velocidad inicial
         self.speed = [0, 0]
 
-    def update(self, evento):
+    def update(self, event):
         # Buscar si se presionó flecha izquierda
-        if evento.key == pygame.K_LEFT and self.rect.left > 0:
+        if event.key == pygame.K_LEFT and self.rect.left > 0:
             self.speed = [-5, 0]
         # Buscar si se presionó flecha derecha
-        elif evento.key == pygame.K_RIGHT and self.rect.right < WIDTH:
+        elif event.key == pygame.K_RIGHT and self.rect.right < WIDTH:
             self.speed = [5, 0]
         else:
             self.speed = [0, 0]
         # Mover en base a posicion actual y velocidad
         self.rect.move_ip(self.speed)
+
+
+class Brick(pygame.sprite.Sprite):
+    def __init__(self, position):
+        pygame.sprite.Sprite.__init__(self)
+        # Cargar imagen
+        self.image = pygame.image.load('assets/brick.png')
+        # Obtener rectangulo de la imagen
+        self.rect = self.image.get_rect()
+        # Posicion inicial, provista externamente
+        self.rect.topleft = position
+
+
+class Wall(pygame.sprite.Group):
+    def __init__(self, qBricks):
+        pygame.sprite.Group.__init__(self)
+
+        pos_x = 0
+        pos_y = 20
+        for i in range(qBricks):
+            brick = Brick((pos_x, pos_y))
+            self.add(brick)
+
+            pos_x += brick.rect.width
+            if pos_x >= WIDTH:
+                pos_x = 0
+                pos_y += brick.rect.height
+
 
 # Inicializando pantalla
 
@@ -65,8 +93,12 @@ clock = pygame.time.Clock()
 # Ajustar repetición de evento de tecla presionada
 pygame.key.set_repeat(30)
 
+
+# Instanciando objetos en pantalla
+
 ball = Ball()
 player = Paddle()
+wall = Wall(10)
 
 while True:
     # Establecer FPS
@@ -90,5 +122,7 @@ while True:
     screen.blit(ball.image, ball.rect)
     # Dibujar jugador en pantalla
     screen.blit(player.image, player.rect)
+    # Dibujar los ladrillos
+    wall.draw(screen)
     # Actualizar los elementos en pantalla
     pygame.display.flip()
