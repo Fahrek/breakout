@@ -1,10 +1,12 @@
 import sys  # para usar exit()
+import time  # para usar sleep()
 import pygame
 
 WIDTH = 640
 HEIGHT = 480
 bgBlueCol = (0, 0, 64)  # Color azul para el fondo
 
+pygame.init()
 
 class Ball(pygame.sprite.Sprite):
     def __init__(self):
@@ -21,7 +23,7 @@ class Ball(pygame.sprite.Sprite):
 
     def update(self):
         # Evitar que salga por arriba y por abajo
-        if self.rect.bottom >= HEIGHT or self.rect.top <= 0:
+        if self.rect.top <= 0:
             self.speed[1] = -self.speed[1]
         # Evitar que salga por la derecha y por la izquierda
         if self.rect.right >= WIDTH or self.rect.left <= 0:
@@ -81,6 +83,21 @@ class Wall(pygame.sprite.Group):
                 pos_x = 0
                 pos_y += brick.rect.height
 
+# Funcion llamada tras dejar ir la bola
+
+
+def game_over():
+    font = pygame.font.SysFont('Arial', 72)
+    text = font.render('GAME OVER :(', True, (255, 255, 255))
+    text_rect = text.get_rect()
+    text_rect.center = [WIDTH / 2, HEIGHT / 2]
+    screen.blit(text, text_rect)
+    pygame.display.flip()
+    # Pausar por tres segundos
+    time.sleep(3)
+    # Salir
+    sys.exit()
+
 
 # Inicializando pantalla
 
@@ -130,6 +147,10 @@ while True:
         else:
             ball.speed[1] = -ball.speed[1]
         wall.remove(brick)
+
+    # Revisar si la bola sale de la pantalla
+    if ball.rect.top > HEIGHT:
+        game_over()
 
     # Rellenar fondo de pantalla con el color azul
     screen.fill(bgBlueCol)
