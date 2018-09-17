@@ -5,6 +5,7 @@ import pygame
 WIDTH = 640
 HEIGHT = 480
 bgBlueCol = (0, 0, 64)  # Color azul para el fondo
+white_color = (255, 255, 255)  # Color blanco para textos
 
 pygame.init()
 
@@ -99,6 +100,14 @@ def game_over():
     sys.exit()
 
 
+def show_points():
+    font = pygame.font.SysFont('Consolas', 20)
+    text = font.render(str(points).zfill(5), True, white_color)
+    text_rect = text.get_rect()
+    text_rect.topleft = [0, 0]
+    screen.blit(text, text_rect)
+
+
 # Inicializando pantalla
 
 
@@ -116,6 +125,7 @@ pygame.key.set_repeat(30)
 ball = Ball()
 player = Paddle()
 wall = Wall(50)
+points = 0
 
 while True:
     # Establecer FPS
@@ -147,6 +157,7 @@ while True:
         else:
             ball.speed[1] = -ball.speed[1]
         wall.remove(brick)
+        points += 10
 
     # Revisar si la bola sale de la pantalla
     if ball.rect.top > HEIGHT:
@@ -154,6 +165,8 @@ while True:
 
     # Rellenar fondo de pantalla con el color azul
     screen.fill(bgBlueCol)
+    # Mostrar puntuacion
+    show_points()
     # Dibujar bola en pantalla
     screen.blit(ball.image, ball.rect)
     # Dibujar jugador en pantalla
