@@ -98,7 +98,7 @@ pygame.key.set_repeat(30)
 
 ball = Ball()
 player = Paddle()
-wall = Wall(10)
+wall = Wall(50)
 
 while True:
     # Establecer FPS
@@ -115,6 +115,21 @@ while True:
 
     # Actualizar la posicion de la bola
     ball.update()
+
+    # Colision entre la bola y el jugador
+    if pygame.sprite.collide_rect(ball, player):
+        ball.speed[1] = -ball.speed[1]
+
+    # Colision de la bola con el muro
+    list = pygame.sprite.spritecollide(ball, wall, False)
+    if list:
+        brick = list[0]
+        cx = ball.rect.centerx
+        if cx < brick.rect.left or cx > brick.rect.right:
+            ball.speed[0] = -ball.speed[0]
+        else:
+            ball.speed[1] = -ball.speed[1]
+        wall.remove(brick)
 
     # Rellenar fondo de pantalla con el color azul
     screen.fill(bgBlueCol)
